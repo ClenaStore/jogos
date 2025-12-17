@@ -2,103 +2,180 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Login • Apostas Futebol</title>
+<title>Apostas Futebol • Login</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#2563eb">
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-*{box-sizing:border-box;font-family:Inter,system-ui}
-body{margin:0;height:100vh;background:#f5f7fa;overflow:hidden}
+:root{
+  --blue:#2563eb;
+  --blue-dark:#1e40af;
+  --orange:#ff8a00;
+  --bg:#f4f7fb;
+}
 
-/* FUNDO */
+*{box-sizing:border-box;font-family:Inter,system-ui}
+body{
+  margin:0;
+  height:100vh;
+  background:var(--bg);
+  overflow:hidden;
+}
+
+/* BACKGROUND */
 .bg-top{
-  position:absolute;top:-25%;left:-10%;
-  width:120%;height:55%;
-  background:linear-gradient(180deg,#ff9f1c,#ff7a00);
+  position:absolute;
+  top:-28%;
+  left:-10%;
+  width:120%;
+  height:55%;
+  background:linear-gradient(180deg,#ffa31a,var(--orange));
   border-radius:0 0 50% 50%;
 }
 .bg-bottom{
-  position:absolute;bottom:0;left:0;
-  width:100%;height:18%;
-  background:#1f4fd8;
+  position:absolute;
+  bottom:0;
+  left:0;
+  width:100%;
+  height:20%;
+  background:linear-gradient(180deg,var(--blue),var(--blue-dark));
 }
 
-/* LAYOUT */
+/* CONTAINER */
 .container{
-  position:relative;height:100%;
-  display:flexflex;display:flex;
-  align-items:center;justify-content:center;padding:20px;
+  position:relative;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
 }
+
+/* CARD */
 .card{
-  width:100%;max-width:360px;
-  background:#fff;border-radius:22px;
-  padding:28px 24px 32px;
-  box-shadow:0 20px 50px rgba(0,0,0,.12);
+  width:100%;
+  max-width:380px;
+  padding:30px 26px 34px;
+  border-radius:24px;
+  background:rgba(255,255,255,.92);
+  backdrop-filter:blur(8px);
+  box-shadow:
+    0 30px 60px rgba(0,0,0,.15),
+    inset 0 1px 0 rgba(255,255,255,.4);
+  animation:fadeUp .6s ease;
+}
+
+@keyframes fadeUp{
+  from{opacity:0;transform:translateY(20px)}
+  to{opacity:1;transform:translateY(0)}
 }
 
 /* TABS */
-.tabs{display:flex;margin-bottom:24px}
+.tabs{
+  position:relative;
+  display:flex;
+  margin-bottom:26px;
+}
 .tabs button{
-  flex:1;border:none;background:none;
-  font-size:18px;font-weight:700;
-  padding-bottom:8px;cursor:pointer;
+  flex:1;
+  background:none;
+  border:none;
+  font-size:18px;
+  font-weight:700;
+  padding-bottom:10px;
+  cursor:pointer;
   color:#9ca3af;
 }
-.tabs button.active{
-  color:#111827;border-bottom:2.5px solid #2563eb;
+.tabs button.active{color:#111827}
+
+.tab-indicator{
+  position:absolute;
+  bottom:0;
+  left:0;
+  width:50%;
+  height:3px;
+  background:var(--blue);
+  border-radius:99px;
+  transition:.35s;
 }
 
-/* CAMPOS */
-.field{margin-bottom:14px}
+/* FORM */
+.field{margin-bottom:16px}
 .field label{
-  font-size:13px;color:#6b7280;
-  margin-bottom:6px;display:block;
+  font-size:13px;
+  color:#6b7280;
+  margin-bottom:6px;
+  display:block;
 }
 .field input{
-  width:100%;padding:14px 16px;
-  border-radius:16px;border:none;
-  background:#eef4ff;font-size:15px;
-}
-.field input:focus{outline:none;background:#e7efff}
-
-/* TERMOS */
-.terms{
-  display:flex;gap:10px;
-  font-size:12.5px;color:#374151;
-  margin:10px 0;
-}
-
-/* BOTÃO */
-.btn{
-  width:100%;margin-top:10px;
-  padding:14px;border:none;
+  width:100%;
+  padding:15px 16px;
   border-radius:16px;
-  background:#2563eb;color:#fff;
-  font-size:16px;font-weight:700;
-  cursor:pointer;
+  border:none;
+  background:#eef4ff;
+  font-size:15px;
+  transition:.25s;
+}
+.field input:focus{
+  outline:none;
+  background:#e7efff;
+  box-shadow:0 0 0 2px rgba(37,99,235,.15);
 }
 
-/* ERRO */
+/* BUTTON */
+.btn{
+  width:100%;
+  margin-top:12px;
+  padding:15px;
+  border:none;
+  border-radius:18px;
+  background:linear-gradient(180deg,#3b82f6,var(--blue));
+  color:#fff;
+  font-size:16px;
+  font-weight:800;
+  cursor:pointer;
+  transition:.25s;
+}
+.btn:hover{filter:brightness(1.05)}
+.btn:active{transform:scale(.98)}
+
+/* TERMS */
+.terms{
+  display:flex;
+  gap:10px;
+  font-size:12.5px;
+  color:#374151;
+  margin:12px 0 4px;
+}
+
+/* ERROR */
 .error{
-  margin-top:12px;font-size:13px;
-  color:#dc2626;display:none;
+  margin-top:14px;
+  font-size:13px;
+  color:#dc2626;
   text-align:center;
+  display:none;
 }
 
 /* OVERLAY */
 .overlay{
-  position:fixed;inset:0;
-  background:rgba(255,255,255,.85);
-  display:none;align-items:center;
-  justify-content:center;z-index:999;
+  position:fixed;
+  inset:0;
+  background:rgba(255,255,255,.6);
+  backdrop-filter:blur(4px);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:999;
 }
 .loader{
-  width:42px;height:42px;
+  width:46px;
+  height:46px;
   border:4px solid #dbeafe;
-  border-top-color:#2563eb;
+  border-top-color:var(--blue);
   border-radius:50%;
   animation:spin 1s linear infinite;
 }
@@ -119,6 +196,7 @@ body{margin:0;height:100vh;background:#f5f7fa;overflow:hidden}
     <div class="tabs">
       <button id="btnLogin" class="active">Login</button>
       <button id="btnRegister">Cadastro</button>
+      <div class="tab-indicator" id="indicator"></div>
     </div>
 
     <!-- LOGIN -->
@@ -163,37 +241,39 @@ const supabase = supabasejs.createClient(
 
 const overlay = document.getElementById("overlay");
 const erroBox = document.getElementById("msgErro");
+const indicator = document.getElementById("indicator");
 
-/* OVERLAY */
-const showOverlay = ()=> overlay.style.display="flex";
-const hideOverlay = ()=> overlay.style.display="none";
+if(localStorage.getItem("sessionUser")){
+  location.href="index.html";
+}
+
+/* UTIL */
+const showOverlay = ()=>overlay.style.display="flex";
+const hideOverlay = ()=>overlay.style.display="none";
+const erro = msg=>{
+  erroBox.innerText = msg;
+  erroBox.style.display="block";
+};
 
 /* TABS */
-btnLogin.onclick = ()=>toggleTab("login");
-btnRegister.onclick = ()=>toggleTab("register");
-
-function toggleTab(tab){
+btnLogin.onclick = ()=>{
+  indicator.style.left="0";
+  btnLogin.classList.add("active");
+  btnRegister.classList.remove("active");
+  loginForm.style.display="block";
+  registerForm.style.display="none";
   erroBox.style.display="none";
-  if(tab==="login"){
-    btnLogin.classList.add("active");
-    btnRegister.classList.remove("active");
-    loginForm.style.display="block";
-    registerForm.style.display="none";
-  }else{
-    btnRegister.classList.add("active");
-    btnLogin.classList.remove("active");
-    loginForm.style.display="none";
-    registerForm.style.display="block";
-  }
-}
+};
+btnRegister.onclick = ()=>{
+  indicator.style.left="50%";
+  btnRegister.classList.add("active");
+  btnLogin.classList.remove("active");
+  loginForm.style.display="none";
+  registerForm.style.display="block";
+  erroBox.style.display="none";
+};
 
-/* ERRO */
-function erro(msg){
-  erroBox.innerText = msg;
-  erroBox.style.display = "block";
-}
-
-/* MÁSCARAS */
+/* MASKS */
 function maskCpf(el){
   el.value = el.value.replace(/\D/g,'').slice(0,11)
     .replace(/(\d{3})(\d)/,'$1.$2')
@@ -206,7 +286,7 @@ function maskPhone(el){
     .replace(/(\d{5})(\d{4})$/,'$1-$2');
 }
 
-/* EVENTOS */
+/* EVENTS */
 loginCpf.oninput = async ()=>{
   maskCpf(loginCpf);
   if(loginCpf.value.replace(/\D/g,'').length!==11) return;
@@ -221,7 +301,7 @@ loginCpf.oninput = async ()=>{
 
     hideOverlay();
     if(!data){
-      toggleTab("register");
+      btnRegister.click();
       regCpf.value = loginCpf.value;
       erro("CPF não encontrado. Faça o cadastro.");
     }
@@ -256,7 +336,7 @@ loginBtn.onclick = async ()=>{
   }
 };
 
-/* CADASTRO */
+/* REGISTER */
 registerBtn.onclick = async ()=>{
   if(!aceiteTermos.checked) return erro("Aceite os termos");
 
@@ -283,7 +363,7 @@ registerBtn.onclick = async ()=>{
     });
 
     hideOverlay();
-    toggleTab("login");
+    btnLogin.click();
     erro("Cadastro realizado. Faça login.");
   }catch{
     hideOverlay();
