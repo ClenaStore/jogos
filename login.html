@@ -16,7 +16,6 @@
   --orange:#ff8a00;
   --bg:#f4f7fb;
 }
-
 *{box-sizing:border-box;font-family:Inter,system-ui}
 body{
   margin:0;
@@ -62,12 +61,9 @@ body{
   border-radius:24px;
   background:rgba(255,255,255,.92);
   backdrop-filter:blur(8px);
-  box-shadow:
-    0 30px 60px rgba(0,0,0,.15),
-    inset 0 1px 0 rgba(255,255,255,.4);
+  box-shadow:0 30px 60px rgba(0,0,0,.15);
   animation:fadeUp .6s ease;
 }
-
 @keyframes fadeUp{
   from{opacity:0;transform:translateY(20px)}
   to{opacity:1;transform:translateY(0)}
@@ -90,7 +86,6 @@ body{
   color:#9ca3af;
 }
 .tabs button.active{color:#111827}
-
 .tab-indicator{
   position:absolute;
   bottom:0;
@@ -117,7 +112,6 @@ body{
   border:none;
   background:#eef4ff;
   font-size:15px;
-  transition:.25s;
 }
 .field input:focus{
   outline:none;
@@ -137,10 +131,7 @@ body{
   font-size:16px;
   font-weight:800;
   cursor:pointer;
-  transition:.25s;
 }
-.btn:hover{filter:brightness(1.05)}
-.btn:active{transform:scale(.98)}
 
 /* TERMS */
 .terms{
@@ -215,8 +206,8 @@ body{
     <!-- CADASTRO -->
     <div id="registerForm" style="display:none">
       <div class="field"><label>Nome</label><input id="regNome"></div>
-      <div class="field"><label>CPF</label><input id="regCpf" inputmode="numeric"></div>
-      <div class="field"><label>WhatsApp</label><input id="regWhatsapp" inputmode="numeric"></div>
+      <div class="field"><label>CPF</label><input id="regCpf" inputmode="numeric" placeholder="000.000.000-00"></div>
+      <div class="field"><label>WhatsApp</label><input id="regWhatsapp" inputmode="numeric" placeholder="(00) 00000-0000"></div>
       <div class="field"><label>Email</label><input id="regEmail"></div>
       <div class="field"><label>Senha</label><input type="password" id="regPass"></div>
 
@@ -243,17 +234,33 @@ const overlay = document.getElementById("overlay");
 const erroBox = document.getElementById("msgErro");
 const indicator = document.getElementById("indicator");
 
-if(localStorage.getItem("sessionUser")){
-  location.href="index.html";
-}
-
-/* UTIL */
+/* UTILS */
 const showOverlay = ()=>overlay.style.display="flex";
 const hideOverlay = ()=>overlay.style.display="none";
 const erro = msg=>{
   erroBox.innerText = msg;
   erroBox.style.display="block";
 };
+
+/* MASKS */
+function maskCpf(el){
+  let v = el.value.replace(/\D/g,'').slice(0,11);
+  v = v.replace(/(\d{3})(\d)/,'$1.$2');
+  v = v.replace(/(\d{3})(\d)/,'$1.$2');
+  v = v.replace(/(\d{3})(\d{1,2})$/,'$1-$2');
+  el.value = v;
+}
+function maskPhone(el){
+  let v = el.value.replace(/\D/g,'').slice(0,11);
+  v = v.replace(/(\d{2})(\d)/,'($1) $2');
+  v = v.replace(/(\d{5})(\d{4})$/,'$1-$2');
+  el.value = v;
+}
+
+/* EVENTS */
+loginCpf.oninput = ()=>maskCpf(loginCpf);
+regCpf.oninput = ()=>maskCpf(regCpf);
+regWhatsapp.oninput = ()=>maskPhone(regWhatsapp);
 
 /* TABS */
 btnLogin.onclick = ()=>{
@@ -271,104 +278,6 @@ btnRegister.onclick = ()=>{
   loginForm.style.display="none";
   registerForm.style.display="block";
   erroBox.style.display="none";
-};
-
-/* MASKS */
-function maskCpf(el){
-  el.value = el.value.replace(/\D/g,'').slice(0,11)
-    .replace(/(\d{3})(\d)/,'$1.$2')
-    .replace(/(\d{3})(\d)/,'$1.$2')
-    .replace(/(\d{3})(\d{1,2})$/,'$1-$2');
-}
-function maskPhone(el){
-  el.value = el.value.replace(/\D/g,'').slice(0,11)
-    .replace(/(\d{2})(\d)/,'($1) $2')
-    .replace(/(\d{5})(\d{4})$/,'$1-$2');
-}
-
-/* EVENTS */
-loginCpf.oninput = async ()=>{
-  maskCpf(loginCpf);
-  if(loginCpf.value.replace(/\D/g,'').length!==11) return;
-
-  showOverlay();
-  try{
-    const { data } = await supabase
-      .from("usuarios")
-      .select("id")
-      .eq("cpf",loginCpf.value)
-      .single();
-
-    hideOverlay();
-    if(!data){
-      btnRegister.click();
-      regCpf.value = loginCpf.value;
-      erro("CPF não encontrado. Faça o cadastro.");
-    }
-  }catch{
-    hideOverlay();
-    erro("Erro de conexão.");
-  }
-};
-
-regCpf.oninput = ()=>maskCpf(regCpf);
-regWhatsapp.oninput = ()=>maskPhone(regWhatsapp);
-
-/* LOGIN */
-loginBtn.onclick = async ()=>{
-  showOverlay();
-  try{
-    const { data } = await supabase
-      .from("usuarios")
-      .select("*")
-      .eq("cpf",loginCpf.value)
-      .eq("senha",loginPass.value)
-      .single();
-
-    hideOverlay();
-    if(!data) return erro("CPF ou senha inválidos");
-
-    localStorage.setItem("sessionUser",JSON.stringify(data));
-    location.href="index.html";
-  }catch{
-    hideOverlay();
-    erro("Erro de conexão.");
-  }
-};
-
-/* REGISTER */
-registerBtn.onclick = async ()=>{
-  if(!aceiteTermos.checked) return erro("Aceite os termos");
-
-  showOverlay();
-  try{
-    const { data } = await supabase
-      .from("usuarios")
-      .select("id")
-      .eq("cpf",regCpf.value)
-      .single();
-
-    if(data){
-      hideOverlay();
-      return erro("CPF já cadastrado.");
-    }
-
-    await supabase.from("usuarios").insert({
-      nome:regNome.value,
-      cpf:regCpf.value,
-      whatsapp:regWhatsapp.value,
-      email:regEmail.value,
-      senha:regPass.value,
-      aceitou_termos:true
-    });
-
-    hideOverlay();
-    btnLogin.click();
-    erro("Cadastro realizado. Faça login.");
-  }catch{
-    hideOverlay();
-    erro("Erro de conexão.");
-  }
 };
 </script>
 
