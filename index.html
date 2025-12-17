@@ -13,10 +13,13 @@
 <style>
 *{box-sizing:border-box;font-family:Inter,system-ui}
 body{margin:0;height:100vh;background:#f5f7fa;overflow:hidden}
+
+/* fundo */
 .bg-shape{position:absolute;width:120%;height:45%;border-radius:0 0 50% 50%}
 .bg-top{background:linear-gradient(135deg,#ff7a00,#ffb347);top:-15%;left:-10%}
 .bg-bottom{background:linear-gradient(135deg,#1e40af,#2563eb);bottom:-20%;right:-15%}
 
+/* layout */
 .container{
   position:relative;height:100%;
   display:flex;align-items:center;justify-content:center;padding:20px;
@@ -26,6 +29,8 @@ body{margin:0;height:100vh;background:#f5f7fa;overflow:hidden}
   padding:28px 24px 32px;
   box-shadow:0 20px 50px rgba(0,0,0,.12);
 }
+
+/* tabs */
 .tabs{display:flex;margin-bottom:24px}
 .tabs button{
   flex:1;border:none;background:none;font-size:18px;
@@ -33,6 +38,7 @@ body{margin:0;height:100vh;background:#f5f7fa;overflow:hidden}
 }
 .tabs button.active{color:#111827;border-bottom:3px solid #2563eb}
 
+/* fields */
 .field{margin-bottom:14px}
 .field label{font-size:13px;color:#6b7280;margin-bottom:6px;display:block}
 .field input{
@@ -41,23 +47,42 @@ body{margin:0;height:100vh;background:#f5f7fa;overflow:hidden}
 }
 .field input:focus{outline:none;border-color:#2563eb}
 
+/* termos */
 .terms{
   display:flex;gap:10px;font-size:12.5px;color:#374151;
   margin:10px 0 6px;line-height:1.4;
 }
 .terms input{margin-top:3px}
-.terms a{color:#2563eb;text-decoration:none;font-weight:600}
+.terms a{color:#2563eb;font-weight:600;text-decoration:none}
 
+/* botao */
 .btn{
   width:100%;margin-top:10px;padding:14px;border:none;
   border-radius:16px;background:#2563eb;color:#fff;
   font-size:16px;font-weight:700;cursor:pointer;
 }
 
+/* erro */
 .error{
   margin-top:12px;font-size:13px;color:#dc2626;
   display:none;text-align:center;
 }
+
+/* OVERLAY */
+.overlay{
+  position:fixed;inset:0;
+  background:rgba(255,255,255,.85);
+  display:none;align-items:center;justify-content:center;
+  z-index:999;
+}
+.loader{
+  width:42px;height:42px;
+  border:4px solid #dbeafe;
+  border-top-color:#2563eb;
+  border-radius:50%;
+  animation:spin 1s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
 </style>
 </head>
 
@@ -65,6 +90,10 @@ body{margin:0;height:100vh;background:#f5f7fa;overflow:hidden}
 
 <div class="bg-shape bg-top"></div>
 <div class="bg-shape bg-bottom"></div>
+
+<div class="overlay" id="overlay">
+  <div class="loader"></div>
+</div>
 
 <div class="container">
   <div class="card">
@@ -110,12 +139,11 @@ body{margin:0;height:100vh;background:#f5f7fa;overflow:hidden}
         <input type="password" id="regPass">
       </div>
 
-      <!-- TERMO -->
       <div class="terms">
         <input type="checkbox" id="aceiteTermos">
         <div>
           Declaro que sou maior de 18 anos e concordo com a
-          <a href="#" onclick="alert('Política de Privacidade')">Política de Privacidade</a>.
+          <a href="#">Política de Privacidade</a>.
         </div>
       </div>
 
@@ -129,13 +157,15 @@ body{margin:0;height:100vh;background:#f5f7fa;overflow:hidden}
 
 <script>
 const supabase = supabasejs.createClient(
-  "SUPABASE_URL",
-  "SUPABASE_ANON_KEY"
+  "https://qvlfuqxqxcgfjxkmtyyy.supabase.co",
+  "sb_publishable_w5vrkvi_8rUGP3_vwofSIg_TD8XISuJ"
 );
 
 if(localStorage.getItem("sessionUser")){
   window.location.href="index.html";
 }
+
+const overlay = document.getElementById("overlay");
 
 // máscaras
 function maskCpf(el){
@@ -150,7 +180,24 @@ function maskPhone(el){
     .replace(/(\d{5})(\d{4})$/,'$1-$2');
 }
 
-loginCpf.oninput=()=>maskCpf(loginCpf);
+loginCpf.oninput = async () => {
+  maskCpf(loginCpf);
+  const cpf = loginCpf.value.replace(/\D/g,'');
+  if(cpf.length === 11){
+    const { data } = await supabase
+      .from("usuarios")
+      .select("id")
+      .eq("cpf", loginCpf.value)
+      .single();
+
+    if(!data){
+      showRegister();
+      erro("CPF não encontrado. Faça o cadastro.");
+      regCpf.value = loginCpf.value;
+    }
+  }
+};
+
 regCpf.oninput=()=>maskCpf(regCpf);
 regWhatsapp.oninput=()=>maskPhone(regWhatsapp);
 
@@ -175,15 +222,16 @@ function erro(msg){
 
 // LOGIN
 async function login(){
-  const cpf = loginCpf.value;
-  const senha = loginPass.value;
+  overlay.style.display="flex";
 
   const { data, error } = await supabase
     .from("usuarios")
     .select("*")
-    .eq("cpf",cpf)
-    .eq("senha",senha)
+    .eq("cpf",loginCpf.value)
+    .eq("senha",loginPass.value)
     .single();
+
+  overlay.style.display="none";
 
   if(error || !data){
     return erro("CPF ou senha inválidos");
@@ -195,38 +243,24 @@ async function login(){
 
 // CADASTRO
 async function register(){
-  const nome = regNome.value;
-  const cpf = regCpf.value;
-  const whatsapp = regWhatsapp.value;
-  const email = regEmail.value;
-  const senha = regPass.value;
-  const aceitou = aceiteTermos.checked;
-
-  if(!nome || !cpf || !whatsapp || !senha){
-    return erro("Preencha todos os campos");
+  if(!aceiteTermos.checked){
+    return erro("É obrigatório aceitar os termos");
   }
 
-  if(!aceitou){
-    return erro("É obrigatório confirmar que é maior de 18 anos e aceitar os termos");
-  }
-
-  const { data:existe } = await supabase
-    .from("usuarios")
-    .select("id")
-    .eq("cpf",cpf)
-    .single();
-
-  if(existe){
-    showLogin();
-    return erro("CPF já cadastrado. Faça login.");
-  }
+  overlay.style.display="flex";
 
   const { error } = await supabase
     .from("usuarios")
     .insert({
-      nome, cpf, whatsapp, email, senha,
+      nome:regNome.value,
+      cpf:regCpf.value,
+      whatsapp:regWhatsapp.value,
+      email:regEmail.value,
+      senha:regPass.value,
       aceitou_termos:true
     });
+
+  overlay.style.display="none";
 
   if(error){
     return erro("Erro ao cadastrar");
