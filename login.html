@@ -52,8 +52,6 @@ body{margin:0;height:100vh;background:#f5f7fa;overflow:hidden}
   display:flex;gap:10px;font-size:12.5px;color:#374151;
   margin:10px 0 6px;line-height:1.4;
 }
-.terms input{margin-top:3px}
-.terms a{color:#2563eb;font-weight:600;text-decoration:none}
 
 /* botao */
 .btn{
@@ -68,7 +66,7 @@ body{margin:0;height:100vh;background:#f5f7fa;overflow:hidden}
   display:none;text-align:center;
 }
 
-/* OVERLAY */
+/* overlay */
 .overlay{
   position:fixed;inset:0;
   background:rgba(255,255,255,.85);
@@ -141,10 +139,7 @@ body{margin:0;height:100vh;background:#f5f7fa;overflow:hidden}
 
       <div class="terms">
         <input type="checkbox" id="aceiteTermos">
-        <div>
-          Declaro que sou maior de 18 anos e concordo com a
-          <a href="#">Política de Privacidade</a>.
-        </div>
+        <div>Sou maior de 18 anos e aceito a Política de Privacidade.</div>
       </div>
 
       <button class="btn" onclick="register()">Cadastrar</button>
@@ -182,19 +177,30 @@ function maskPhone(el){
 
 loginCpf.oninput = async () => {
   maskCpf(loginCpf);
-  const cpf = loginCpf.value.replace(/\D/g,'');
-  if(cpf.length === 11){
-    const { data } = await supabase
+  const cpfRaw = loginCpf.value.replace(/\D/g,'');
+
+  if(cpfRaw.length !== 11) return;
+
+  overlay.style.display="flex";
+
+  try{
+    const { data, error } = await supabase
       .from("usuarios")
       .select("id")
       .eq("cpf", loginCpf.value)
       .single();
+
+    overlay.style.display="none";
 
     if(!data){
       showRegister();
       erro("CPF não encontrado. Faça o cadastro.");
       regCpf.value = loginCpf.value;
     }
+
+  }catch(e){
+    overlay.style.display="none";
+    erro("Não foi possível conectar ao servidor.");
   }
 };
 
@@ -223,22 +229,27 @@ function erro(msg){
 // LOGIN
 async function login(){
   overlay.style.display="flex";
+  try{
+    const { data, error } = await supabase
+      .from("usuarios")
+      .select("*")
+      .eq("cpf",loginCpf.value)
+      .eq("senha",loginPass.value)
+      .single();
 
-  const { data, error } = await supabase
-    .from("usuarios")
-    .select("*")
-    .eq("cpf",loginCpf.value)
-    .eq("senha",loginPass.value)
-    .single();
+    overlay.style.display="none";
 
-  overlay.style.display="none";
+    if(error || !data){
+      return erro("CPF ou senha inválidos");
+    }
 
-  if(error || !data){
-    return erro("CPF ou senha inválidos");
+    localStorage.setItem("sessionUser", JSON.stringify(data));
+    window.location.href="index.html";
+
+  }catch(e){
+    overlay.style.display="none";
+    erro("Erro de conexão com o servidor");
   }
-
-  localStorage.setItem("sessionUser", JSON.stringify(data));
-  window.location.href="index.html";
 }
 
 // CADASTRO
@@ -249,25 +260,31 @@ async function register(){
 
   overlay.style.display="flex";
 
-  const { error } = await supabase
-    .from("usuarios")
-    .insert({
-      nome:regNome.value,
-      cpf:regCpf.value,
-      whatsapp:regWhatsapp.value,
-      email:regEmail.value,
-      senha:regPass.value,
-      aceitou_termos:true
-    });
+  try{
+    const { error } = await supabase
+      .from("usuarios")
+      .insert({
+        nome:regNome.value,
+        cpf:regCpf.value,
+        whatsapp:regWhatsapp.value,
+        email:regEmail.value,
+        senha:regPass.value,
+        aceitou_termos:true
+      });
 
-  overlay.style.display="none";
+    overlay.style.display="none";
 
-  if(error){
-    return erro("Erro ao cadastrar");
+    if(error){
+      return erro("Erro ao cadastrar usuário");
+    }
+
+    showLogin();
+    erro("Cadastro realizado. Faça login.");
+
+  }catch(e){
+    overlay.style.display="none";
+    erro("Não foi possível conectar ao servidor");
   }
-
-  showLogin();
-  erro("Cadastro realizado. Faça login.");
 }
 </script>
 
