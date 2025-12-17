@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <title>Login • Apostas Futebol</title>
-
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#2563eb">
 
@@ -15,17 +14,27 @@
 body{margin:0;height:100vh;background:#f5f7fa;overflow:hidden}
 
 /* FUNDO */
-.bg-shape{position:absolute;width:120%;height:55%;border-radius:0 0 50% 50%}
-.bg-top{background:linear-gradient(180deg,#ff9f1c,#ff7a00);top:-25%;left:-10%}
-.bg-bottom{background:#1f4fd8;bottom:0;left:0;width:100%;height:18%;border-radius:0}
+.bg-top{
+  position:absolute;top:-25%;left:-10%;
+  width:120%;height:55%;
+  background:linear-gradient(180deg,#ff9f1c,#ff7a00);
+  border-radius:0 0 50% 50%;
+}
+.bg-bottom{
+  position:absolute;bottom:0;left:0;
+  width:100%;height:18%;
+  background:#1f4fd8;
+}
 
 /* LAYOUT */
 .container{
   position:relative;height:100%;
-  display:flex;align-items:center;justify-content:center;padding:20px;
+  display:flexflex;display:flex;
+  align-items:center;justify-content:center;padding:20px;
 }
 .card{
-  width:100%;max-width:360px;background:#fff;border-radius:22px;
+  width:100%;max-width:360px;
+  background:#fff;border-radius:22px;
   padding:28px 24px 32px;
   box-shadow:0 20px 50px rgba(0,0,0,.12);
 }
@@ -33,49 +42,58 @@ body{margin:0;height:100vh;background:#f5f7fa;overflow:hidden}
 /* TABS */
 .tabs{display:flex;margin-bottom:24px}
 .tabs button{
-  flex:1;border:none;background:none;font-size:18px;
-  font-weight:700;padding-bottom:8px;cursor:pointer;color:#9ca3af;
+  flex:1;border:none;background:none;
+  font-size:18px;font-weight:700;
+  padding-bottom:8px;cursor:pointer;
+  color:#9ca3af;
 }
-.tabs button.active{color:#111827;border-bottom:2.5px solid #2563eb}
+.tabs button.active{
+  color:#111827;border-bottom:2.5px solid #2563eb;
+}
 
 /* CAMPOS */
 .field{margin-bottom:14px}
-.field label{font-size:13px;color:#6b7280;margin-bottom:6px;display:block}
+.field label{
+  font-size:13px;color:#6b7280;
+  margin-bottom:6px;display:block;
+}
 .field input{
-  width:100%;
-  padding:14px 16px;
-  border-radius:16px;
-  border:none;
-  background:#eef4ff;
-  font-size:15px;
+  width:100%;padding:14px 16px;
+  border-radius:16px;border:none;
+  background:#eef4ff;font-size:15px;
 }
 .field input:focus{outline:none;background:#e7efff}
 
 /* TERMOS */
 .terms{
-  display:flex;gap:10px;font-size:12.5px;color:#374151;
-  margin:10px 0 6px;line-height:1.4;
+  display:flex;gap:10px;
+  font-size:12.5px;color:#374151;
+  margin:10px 0;
 }
 
 /* BOTÃO */
 .btn{
-  width:100%;margin-top:10px;padding:14px;border:none;
-  border-radius:16px;background:#2563eb;color:#fff;
-  font-size:16px;font-weight:700;cursor:pointer;
+  width:100%;margin-top:10px;
+  padding:14px;border:none;
+  border-radius:16px;
+  background:#2563eb;color:#fff;
+  font-size:16px;font-weight:700;
+  cursor:pointer;
 }
 
 /* ERRO */
 .error{
-  margin-top:12px;font-size:13px;color:#dc2626;
-  display:none;text-align:center;
+  margin-top:12px;font-size:13px;
+  color:#dc2626;display:none;
+  text-align:center;
 }
 
 /* OVERLAY */
 .overlay{
   position:fixed;inset:0;
   background:rgba(255,255,255,.85);
-  display:none;align-items:center;justify-content:center;
-  z-index:999;
+  display:none;align-items:center;
+  justify-content:center;z-index:999;
 }
 .loader{
   width:42px;height:42px;
@@ -90,19 +108,17 @@ body{margin:0;height:100vh;background:#f5f7fa;overflow:hidden}
 
 <body>
 
-<div class="bg-shape bg-top"></div>
-<div class="bg-shape bg-bottom"></div>
+<div class="bg-top"></div>
+<div class="bg-bottom"></div>
 
-<div class="overlay" id="overlay">
-  <div class="loader"></div>
-</div>
+<div class="overlay" id="overlay"><div class="loader"></div></div>
 
 <div class="container">
   <div class="card">
 
     <div class="tabs">
-      <button id="tabLogin" class="active" type="button">Login</button>
-      <button id="tabRegister" type="button">Cadastro</button>
+      <button id="btnLogin" class="active">Login</button>
+      <button id="btnRegister">Cadastro</button>
     </div>
 
     <!-- LOGIN -->
@@ -115,38 +131,23 @@ body{margin:0;height:100vh;background:#f5f7fa;overflow:hidden}
         <label>Senha</label>
         <input type="password" id="loginPass">
       </div>
-      <button class="btn" onclick="login()">Entrar</button>
+      <button class="btn" id="loginBtn">Entrar</button>
     </div>
 
     <!-- CADASTRO -->
     <div id="registerForm" style="display:none">
-      <div class="field">
-        <label>Nome</label>
-        <input id="regNome">
-      </div>
-      <div class="field">
-        <label>CPF</label>
-        <input id="regCpf" inputmode="numeric" placeholder="000.000.000-00">
-      </div>
-      <div class="field">
-        <label>WhatsApp</label>
-        <input id="regWhatsapp" inputmode="numeric" placeholder="(00) 00000-0000">
-      </div>
-      <div class="field">
-        <label>Email</label>
-        <input id="regEmail">
-      </div>
-      <div class="field">
-        <label>Senha</label>
-        <input type="password" id="regPass">
-      </div>
+      <div class="field"><label>Nome</label><input id="regNome"></div>
+      <div class="field"><label>CPF</label><input id="regCpf" inputmode="numeric"></div>
+      <div class="field"><label>WhatsApp</label><input id="regWhatsapp" inputmode="numeric"></div>
+      <div class="field"><label>Email</label><input id="regEmail"></div>
+      <div class="field"><label>Senha</label><input type="password" id="regPass"></div>
 
       <div class="terms">
         <input type="checkbox" id="aceiteTermos">
         <div>Sou maior de 18 anos e aceito a Política de Privacidade.</div>
       </div>
 
-      <button class="btn" onclick="register()">Cadastrar</button>
+      <button class="btn" id="registerBtn">Cadastrar</button>
     </div>
 
     <div class="error" id="msgErro"></div>
@@ -161,34 +162,35 @@ const supabase = supabasejs.createClient(
 );
 
 const overlay = document.getElementById("overlay");
-const msgErro = document.getElementById("msgErro");
+const erroBox = document.getElementById("msgErro");
 
-// sessão
-if(localStorage.getItem("sessionUser")){
-  location.href="index.html";
-}
+/* OVERLAY */
+const showOverlay = ()=> overlay.style.display="flex";
+const hideOverlay = ()=> overlay.style.display="none";
 
 /* TABS */
-tabLogin.onclick = showLogin;
-tabRegister.onclick = showRegister;
+btnLogin.onclick = ()=>toggleTab("login");
+btnRegister.onclick = ()=>toggleTab("register");
 
-function showLogin(){
-  tabLogin.classList.add("active");
-  tabRegister.classList.remove("active");
-  loginForm.style.display="block";
-  registerForm.style.display="none";
-  msgErro.style.display="none";
+function toggleTab(tab){
+  erroBox.style.display="none";
+  if(tab==="login"){
+    btnLogin.classList.add("active");
+    btnRegister.classList.remove("active");
+    loginForm.style.display="block";
+    registerForm.style.display="none";
+  }else{
+    btnRegister.classList.add("active");
+    btnLogin.classList.remove("active");
+    loginForm.style.display="none";
+    registerForm.style.display="block";
+  }
 }
-function showRegister(){
-  tabRegister.classList.add("active");
-  tabLogin.classList.remove("active");
-  loginForm.style.display="none";
-  registerForm.style.display="block";
-  msgErro.style.display="none";
-}
+
+/* ERRO */
 function erro(msg){
-  msgErro.innerText = msg;
-  msgErro.style.display = "block";
+  erroBox.innerText = msg;
+  erroBox.style.display = "block";
 }
 
 /* MÁSCARAS */
@@ -204,71 +206,74 @@ function maskPhone(el){
     .replace(/(\d{5})(\d{4})$/,'$1-$2');
 }
 
-loginCpf.addEventListener("input", onLoginCpf);
-regCpf.addEventListener("input", ()=>maskCpf(regCpf));
-regWhatsapp.addEventListener("input", ()=>maskPhone(regWhatsapp));
-
-/* VERIFICA CPF LOGIN */
-async function onLoginCpf(){
+/* EVENTOS */
+loginCpf.oninput = async ()=>{
   maskCpf(loginCpf);
-  const cpf = loginCpf.value.replace(/\D/g,'');
-  if(cpf.length !== 11) return;
+  if(loginCpf.value.replace(/\D/g,'').length!==11) return;
 
-  overlay.style.display="flex";
+  showOverlay();
   try{
     const { data } = await supabase
       .from("usuarios")
       .select("id")
-      .eq("cpf", loginCpf.value)
+      .eq("cpf",loginCpf.value)
       .single();
 
-    overlay.style.display="none";
-
+    hideOverlay();
     if(!data){
-      showRegister();
+      toggleTab("register");
       regCpf.value = loginCpf.value;
       erro("CPF não encontrado. Faça o cadastro.");
     }
   }catch{
-    overlay.style.display="none";
-    erro("Erro de conexão com o servidor.");
+    hideOverlay();
+    erro("Erro de conexão.");
   }
-}
+};
+
+regCpf.oninput = ()=>maskCpf(regCpf);
+regWhatsapp.oninput = ()=>maskPhone(regWhatsapp);
 
 /* LOGIN */
-async function login(){
-  overlay.style.display="flex";
+loginBtn.onclick = async ()=>{
+  showOverlay();
   try{
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from("usuarios")
       .select("*")
       .eq("cpf",loginCpf.value)
       .eq("senha",loginPass.value)
       .single();
 
-    overlay.style.display="none";
+    hideOverlay();
+    if(!data) return erro("CPF ou senha inválidos");
 
-    if(error || !data){
-      return erro("CPF ou senha inválidos");
-    }
-
-    localStorage.setItem("sessionUser", JSON.stringify(data));
+    localStorage.setItem("sessionUser",JSON.stringify(data));
     location.href="index.html";
   }catch{
-    overlay.style.display="none";
-    erro("Erro de conexão com o servidor");
+    hideOverlay();
+    erro("Erro de conexão.");
   }
-}
+};
 
 /* CADASTRO */
-async function register(){
-  if(!aceiteTermos.checked){
-    return erro("É obrigatório aceitar os termos");
-  }
+registerBtn.onclick = async ()=>{
+  if(!aceiteTermos.checked) return erro("Aceite os termos");
 
-  overlay.style.display="flex";
+  showOverlay();
   try{
-    const { error } = await supabase.from("usuarios").insert({
+    const { data } = await supabase
+      .from("usuarios")
+      .select("id")
+      .eq("cpf",regCpf.value)
+      .single();
+
+    if(data){
+      hideOverlay();
+      return erro("CPF já cadastrado.");
+    }
+
+    await supabase.from("usuarios").insert({
       nome:regNome.value,
       cpf:regCpf.value,
       whatsapp:regWhatsapp.value,
@@ -277,19 +282,14 @@ async function register(){
       aceitou_termos:true
     });
 
-    overlay.style.display="none";
-
-    if(error){
-      return erro("Erro ao cadastrar usuário");
-    }
-
-    showLogin();
+    hideOverlay();
+    toggleTab("login");
     erro("Cadastro realizado. Faça login.");
   }catch{
-    overlay.style.display="none";
-    erro("Erro de conexão com o servidor");
+    hideOverlay();
+    erro("Erro de conexão.");
   }
-}
+};
 </script>
 
 </body>
