@@ -242,18 +242,23 @@ const erro = msg=>{
   erroBox.style.display="block";
 };
 
-/* MASKS */
 function maskCpf(el){
   let v = el.value.replace(/\D/g,'').slice(0,11);
-  v = v.replace(/(\d{3})(\d)/,'$1.$2');
-  v = v.replace(/(\d{3})(\d)/,'$1.$2');
-  v = v.replace(/(\d{3})(\d{1,2})$/,'$1-$2');
+
+  if(v.length > 3) v = v.replace(/^(\d{3})(\d)/, '$1.$2');
+  if(v.length > 7) v = v.replace(/^(\d{3})\.(\d{3})(\d)/, '$1.$2.$3');
+  if(v.length > 11) v = v.replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d{1,2})$/, '$1.$2.$3-$4');
+  if(v.length === 11) v = v.replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d{2})$/, '$1.$2.$3-$4');
+
   el.value = v;
 }
 function maskPhone(el){
   let v = el.value.replace(/\D/g,'').slice(0,11);
-  v = v.replace(/(\d{2})(\d)/,'($1) $2');
-  v = v.replace(/(\d{5})(\d{4})$/,'$1-$2');
+
+  if(v.length >= 2) v = v.replace(/^(\d{2})(\d)/, '($1) $2');
+  if(v.length >= 3) v = v.replace(/^(\(\d{2}\)\s)(\d)/, '$1$2 ');
+  if(v.length >= 7) v = v.replace(/(\d{4})(\d)/, '$1-$2');
+
   el.value = v;
 }
 
